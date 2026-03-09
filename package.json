@@ -1,6 +1,6 @@
 {
   "name": "nuxt-haptic",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Nuxt 4 module for mobile haptics powered by web-haptics.",
   "repository": {
     "type": "git",
