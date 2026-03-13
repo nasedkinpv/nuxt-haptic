@@ -9,7 +9,7 @@ import type {
   HapticEventName,
   NuxtHapticRuntimeConfig,
   NuxtHaptics,
-} from '../types'
+} from '../../types'
 
 const DEFAULT_EVENT: HapticEventName = 'click'
 const DEFAULT_INPUT: HapticInput = 'selection'
@@ -134,6 +134,45 @@ const writeStoredPreference = (config: NuxtHapticRuntimeConfig, enabled: boolean
   }
 }
 
+const setupDirectiveHandler = (
+  element: HapticElement,
+  value: HapticDirectiveValue,
+  config: NuxtHapticRuntimeConfig,
+  nuxtHaptics: NuxtHaptics,
+) => {
+  removeDirectiveHandler(element)
+
+  const resolvedBinding = resolveDirectiveBinding(value, config.touchOnly)
+
+  if (resolvedBinding.disabled) {
+    return
+  }
+
+  const eventName = resolvedBinding.on ?? DEFAULT_EVENT
+  const handler: EventListener = (event) => {
+    if (!isPrimaryActivation(event)) {
+      return
+    }
+
+    if ((resolvedBinding.touchOnly ?? config.touchOnly) && !isTouchCapableDevice()) {
+      return
+    }
+
+    void nuxtHaptics.trigger(
+      resolvedBinding.input ?? config.defaultPreset ?? DEFAULT_INPUT,
+      resolvedBinding.intensity !== undefined
+        ? { intensity: resolvedBinding.intensity }
+        : undefined,
+    )
+  }
+
+  element.addEventListener(eventName, handler)
+  element[DIRECTIVE_STATE] = {
+    eventName,
+    handler,
+  }
+}
+
 export default defineNuxtPlugin((nuxtApp) => {
   const runtimeConfig = useRuntimeConfig()
   const config = Object.freeze({
@@ -186,77 +225,9 @@ export default defineNuxtPlugin((nuxtApp) => {
   }
 
   nuxtApp.vueApp.directive('nuxt-haptic', {
-    mounted(element, binding) {
-      const hapticElement = element as HapticElement
-      const resolvedBinding = resolveDirectiveBinding(binding.value, config.touchOnly)
-
-      if (resolvedBinding.disabled) {
-        removeDirectiveHandler(hapticElement)
-        return
-      }
-
-      const eventName = resolvedBinding.on ?? DEFAULT_EVENT
-      const handler: EventListener = (event) => {
-        if (!isPrimaryActivation(event)) {
-          return
-        }
-
-        if ((resolvedBinding.touchOnly ?? config.touchOnly) && !isTouchCapableDevice()) {
-          return
-        }
-
-        void nuxtHaptics.trigger(
-          resolvedBinding.input ?? config.defaultPreset ?? DEFAULT_INPUT,
-          resolvedBinding.intensity !== undefined
-            ? { intensity: resolvedBinding.intensity }
-            : undefined,
-        )
-      }
-
-      removeDirectiveHandler(hapticElement)
-      hapticElement.addEventListener(eventName, handler)
-      hapticElement[DIRECTIVE_STATE] = {
-        eventName,
-        handler,
-      }
-    },
-    updated(element, binding) {
-      const hapticElement = element as HapticElement
-      const resolvedBinding = resolveDirectiveBinding(binding.value, config.touchOnly)
-
-      removeDirectiveHandler(hapticElement)
-
-      if (resolvedBinding.disabled) {
-        return
-      }
-
-      const eventName = resolvedBinding.on ?? DEFAULT_EVENT
-      const handler: EventListener = (event) => {
-        if (!isPrimaryActivation(event)) {
-          return
-        }
-
-        if ((resolvedBinding.touchOnly ?? config.touchOnly) && !isTouchCapableDevice()) {
-          return
-        }
-
-        void nuxtHaptics.trigger(
-          resolvedBinding.input ?? config.defaultPreset ?? DEFAULT_INPUT,
-          resolvedBinding.intensity !== undefined
-            ? { intensity: resolvedBinding.intensity }
-            : undefined,
-        )
-      }
-
-      hapticElement.addEventListener(eventName, handler)
-      hapticElement[DIRECTIVE_STATE] = {
-        eventName,
-        handler,
-      }
-    },
-    unmounted(element) {
-      removeDirectiveHandler(element as HapticElement)
-    },
+    mounted: (el, binding) => setupDirectiveHandler(el, binding.value, config, nuxtHaptics),
+    updated: (el, binding) => setupDirectiveHandler(el, binding.value, config, nuxtHaptics),
+    unmounted: el => removeDirectiveHandler(el),
   })
 
   nuxtApp.provide('nuxtHaptics', nuxtHaptics)

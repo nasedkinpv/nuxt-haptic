@@ -6,7 +6,7 @@
     >
       Trigger
     </button>
-    <div>{{ $nuxtHaptics.config.defaultPreset }}</div>
+    <pre>{{ JSON.stringify($nuxtHaptics.config.defaultPreset) }}</pre>
   </main>
 </template>
 

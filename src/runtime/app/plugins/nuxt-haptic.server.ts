@@ -1,7 +1,7 @@
 import { defineNuxtPlugin, useRuntimeConfig } from '#app'
 import { readonly, ref } from 'vue'
 
-import type { NuxtHapticRuntimeConfig, NuxtHaptics } from '../types'
+import type { NuxtHapticRuntimeConfig, NuxtHaptics } from '../../types'
 
 const noop = async () => {}
 
