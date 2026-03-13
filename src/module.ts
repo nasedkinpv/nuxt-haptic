@@ -18,11 +18,18 @@ export type {
   HapticPreset,
   NuxtHapticRuntimeConfig,
   NuxtHaptics,
+  PresetName,
   TriggerOptions,
   Vibration,
 } from './runtime/types'
 
 export type ModuleOptions = NuxtHapticRuntimeConfig
+
+declare module 'nuxt/schema' {
+  interface PublicRuntimeConfig {
+    nuxtHaptic: NuxtHapticRuntimeConfig
+  }
+}
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
@@ -44,24 +51,22 @@ export default defineNuxtModule<ModuleOptions>({
   setup(options, nuxt) {
     const resolver = createResolver(import.meta.url)
 
-    const runtimeOptions = defu(
+    nuxt.options.runtimeConfig.public.nuxtHaptic = defu(
       nuxt.options.runtimeConfig.public.nuxtHaptic as Partial<ModuleOptions> | undefined,
       options,
     ) as ModuleOptions
 
-    nuxt.options.runtimeConfig.public.nuxtHaptic = runtimeOptions
-
     addPlugin({
-      src: resolver.resolve('./runtime/plugins/nuxt-haptic.client'),
+      src: resolver.resolve('./runtime/app/plugins/nuxt-haptic.client'),
       mode: 'client',
     })
 
     addPlugin({
-      src: resolver.resolve('./runtime/plugins/nuxt-haptic.server'),
+      src: resolver.resolve('./runtime/app/plugins/nuxt-haptic.server'),
       mode: 'server',
     })
 
-    addImportsDir(resolver.resolve('./runtime/composables'))
+    addImportsDir(resolver.resolve('./runtime/app/composables'))
 
     const typeTemplate = addTypeTemplate({
       filename: 'types/nuxt-haptic.d.ts',

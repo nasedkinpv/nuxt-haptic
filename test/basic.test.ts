@@ -11,6 +11,6 @@ describe('ssr', async () => {
     const html = await $fetch('/')
 
     expect(html).toContain('Trigger')
-    expect(html).toContain('selection')
+    expect(html).toContain('&quot;duration&quot;:12')
   })
 })

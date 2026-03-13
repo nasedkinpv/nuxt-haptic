@@ -5,6 +5,6 @@ export default defineNuxtConfig({
     MyModule,
   ],
   nuxtHaptic: {
-    defaultPreset: 'selection',
+    defaultPreset: [{ duration: 12, intensity: 0.4 }],
   },
 })

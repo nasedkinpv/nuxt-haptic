@@ -68,6 +68,8 @@ export default defineNuxtConfig({
 })
 ```
 
+`defaultPreset` accepts any `web-haptics` input, including built-in preset names, numbers, arrays, and custom pattern objects.
+
 ## API
 
 ### `useNuxtHaptics()`
@@ -90,7 +92,7 @@ Returns:
 If you need types in userland:
 
 ```ts
-import type { HapticInput, TriggerOptions } from 'nuxt-haptic'
+import type { HapticInput, PresetName, TriggerOptions } from 'nuxt-haptic'
 ```
 
 ### `v-nuxt-haptic`

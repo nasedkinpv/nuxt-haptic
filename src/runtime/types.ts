@@ -1,5 +1,5 @@
 import type { Ref } from 'vue'
-import type { HapticInput, TriggerOptions } from 'web-haptics'
+import type { HapticInput, TriggerOptions, defaultPatterns } from 'web-haptics'
 
 export type {
   HapticInput,
@@ -9,10 +9,12 @@ export type {
   Vibration,
 } from 'web-haptics'
 
+export type PresetName = keyof typeof defaultPatterns
+
 export type HapticEventName = 'click' | 'pointerdown' | 'pointerup'
 
 export interface NuxtHapticRuntimeConfig {
-  defaultPreset: string
+  defaultPreset: HapticInput
   debug: boolean
   enabled: boolean
   persistPreference: boolean
