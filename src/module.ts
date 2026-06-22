@@ -1,76 +1,77 @@
 import {
-  addImportsDir,
-  addPlugin,
-  addTypeTemplate,
-  createResolver,
-  defineNuxtModule,
-} from '@nuxt/kit'
-import { defu } from 'defu'
-
-import type { NuxtHapticRuntimeConfig } from './runtime/types'
+	addImportsDir,
+	addPlugin,
+	addTypeTemplate,
+	createResolver,
+	defineNuxtModule,
+} from "@nuxt/kit";
+import type { NuxtHapticRuntimeConfig } from "./runtime/types";
 
 export type {
-  HapticDirectiveBinding,
-  HapticDirectiveValue,
-  HapticEventName,
-  HapticInput,
-  HapticPattern,
-  HapticPreset,
-  NuxtHapticRuntimeConfig,
-  NuxtHaptics,
-  PresetName,
-  TriggerOptions,
-  Vibration,
-} from './runtime/types'
+	HapticDirectiveBinding,
+	HapticDirectiveValue,
+	HapticEventName,
+	HapticInput,
+	HapticPattern,
+	HapticPreset,
+	NuxtHapticRuntimeConfig,
+	NuxtHaptics,
+	PresetName,
+	TriggerOptions,
+	Vibration,
+} from "./runtime/types";
 
-export type ModuleOptions = NuxtHapticRuntimeConfig
+export type ModuleOptions = NuxtHapticRuntimeConfig;
 
-declare module 'nuxt/schema' {
-  interface PublicRuntimeConfig {
-    nuxtHaptic: NuxtHapticRuntimeConfig
-  }
+declare module "nuxt/schema" {
+	interface PublicRuntimeConfig {
+		nuxtHaptic: NuxtHapticRuntimeConfig;
+	}
 }
 
 export default defineNuxtModule<ModuleOptions>({
-  meta: {
-    name: 'nuxt-haptic',
-    configKey: 'nuxtHaptic',
-    compatibility: {
-      nuxt: '^4.0.0',
-    },
-  },
-  defaults: {
-    defaultPreset: 'selection',
-    debug: false,
-    enabled: true,
-    persistPreference: true,
-    preferenceStorageKey: 'nuxt-haptic:enabled',
-    showSwitch: false,
-    touchOnly: true,
-  },
-  setup(options, nuxt) {
-    const resolver = createResolver(import.meta.url)
+	meta: {
+		name: "nuxt-haptic",
+		configKey: "nuxtHaptic",
+		compatibility: {
+			nuxt: "^4.0.0",
+		},
+	},
+	defaults: {
+		defaultPreset: "selection",
+		debug: false,
+		enabled: true,
+		persistPreference: true,
+		preferenceStorageKey: "nuxt-haptic:enabled",
+		showSwitch: false,
+		touchOnly: true,
+	},
+	setup(options, nuxt) {
+		const resolver = createResolver(import.meta.url);
 
-    nuxt.options.runtimeConfig.public.nuxtHaptic = defu(
-      nuxt.options.runtimeConfig.public.nuxtHaptic as Partial<ModuleOptions> | undefined,
-      options,
-    ) as ModuleOptions
+		nuxt.options.runtimeConfig.public.nuxtHaptic = {
+			...options,
+			...(nuxt.options.runtimeConfig.public.nuxtHaptic as
+				| Partial<ModuleOptions>
+				| undefined),
+		} as ModuleOptions;
 
-    addPlugin({
-      src: resolver.resolve('./runtime/app/plugins/nuxt-haptic.client'),
-      mode: 'client',
-    })
+		addPlugin({
+			src: resolver.resolve("./runtime/app/plugins/nuxt-haptic.client"),
+			mode: "client",
+		});
 
-    addPlugin({
-      src: resolver.resolve('./runtime/app/plugins/nuxt-haptic.server'),
-      mode: 'server',
-    })
+		addPlugin({
+			src: resolver.resolve("./runtime/app/plugins/nuxt-haptic.server"),
+			mode: "server",
+		});
 
-    addImportsDir(resolver.resolve('./runtime/app/composables'))
+		addImportsDir(resolver.resolve("./runtime/app/composables"));
 
-    const typeTemplate = addTypeTemplate({
-      filename: 'types/nuxt-haptic.d.ts',
-      getContents: () => `
+		const typeTemplate = addTypeTemplate({
+			filename: "types/nuxt-haptic.d.ts",
+			getContents: () =>
+				`
 import type { NuxtHaptics } from "nuxt-haptic";
 
 declare module "#app" {
@@ -87,10 +88,10 @@ declare module "vue" {
 
 export {};
       `.trim(),
-    })
+		});
 
-    nuxt.hook('prepare:types', ({ references }) => {
-      references.push({ path: typeTemplate.dst })
-    })
-  },
-})
+		nuxt.hook("prepare:types", ({ references }) => {
+			references.push({ path: typeTemplate.dst });
+		});
+	},
+});

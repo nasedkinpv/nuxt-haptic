@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.2.2
+
+- Updated Nuxt, TypeScript, lint, test, and build tooling to current upstream versions.
+- Removed the unused `defu` dependency and simplified module config merging.
+- Simplified CI, playground metadata, ESLint config, and fixture markup.
+
 ## v0.2.1
 
 - Moved runtime plugins and composables under `runtime/app` for Nuxt app runtime conventions.
